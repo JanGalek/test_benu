@@ -1,0 +1,15 @@
+services:
+	- App\Core\RouterFactory::createRouter
+	- App\Utils\Math\PrimeNumber\Validator
+	- App\Utils\Math\PrimeNumber\Generator
+	- App\Utils\Math\PrimeNumber\PrimeNumberFactory
+	- App\Utils\Math\PrimeNumber\TableFactory
+
+
+search:
+	-	in: %appDir%
+		classes:
+			- *Facade
+			- *Factory
+			- *Repository
+			- *Service
