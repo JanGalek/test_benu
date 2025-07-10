@@ -24,6 +24,14 @@ Požadavky:
 
 ## Testy
 
+
+
+## Spuštění
+- `make requirements`
+- `make start`
+
+aplikace je na adrese: http://127.0.0.1:8085/
+
 Nette Web Project
 =================
 
