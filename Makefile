@@ -1,13 +1,10 @@
-.PHONY: assets install tests start image-build image-push image-pull requirements analyse docker-run run start-dev stop stop-dev composer cs csf qa
+.PHONY: install tests start image-build image-push image-pull requirements analyse docker-run docker-npm-run run start-dev stop stop-dev composer cs csf qa npm
 
 COMPOSER_HOME ?= $(HOME)/.config/composer
 COMPOSER_CACHE_DIR ?= $(HOME)/.cache/composer
 MAKEFLAGS += --no-print-directory
 CONTAINER := $(shell command -v podman >/dev/null 2>&1 && echo podman || echo docker)
 VOLUME_SUFFIX := $(if $(filter $(CONTAINER),podman),:z,)
-
-assets:
-	npx vite build
 
 image-build:
 	$(CONTAINER) build -t gouef/php-xdebug:8.4-latest ./.docker/xdebug/8.4
@@ -28,28 +25,50 @@ docker-run:
             --volume $(CURDIR):/app$(VOLUME_SUFFIX) \
             docker.io/gouef/php-xdebug:8.4-latest $(CMD)
 
+docker-node-run:
+	mkdir -p ~/.npm
+	$(CONTAINER) run -it \
+			--tty --interactive \
+            --volume $(CURDIR):/usr/src/app$(VOLUME_SUFFIX) \
+            -w /usr/src/app \
+            --user $(id -u):$(id -g) \
+            docker.io/node:latest sh -c "$(CMD)"
+
 start:
 	$(CONTAINER) compose up -d
 start-dev:
 	$(CONTAINER) compose -f docker-compose.dev.yml up -d
 stop:
-	$(CONTAINER) compose stop
+	$(CONTAINER) compose down
 stop-dev:
-	$(CONTAINER) compose -f docker-compose.dev.yml stop
+	$(CONTAINER) compose -f docker-compose.dev.yml down
 
 run:
 	$(MAKE) docker-run CMD="$(filter-out $@,$(MAKECMDGOALS))"
 
+npm:
+	$(MAKE) docker-node-run CMD="npm $(filter-out $@,$(MAKECMDGOALS))"
+
+npm-install:
+	$(MAKE) docker-node-run CMD="npm install $(filter-out $@,$(MAKECMDGOALS))"
+
+vite-build:
+	$(MAKE) docker-node-run CMD="npx vite build $(filter-out $@,$(MAKECMDGOALS))"
+
+npx:
+	$(MAKE) docker-node-run CMD="npx $(filter-out $@,$(MAKECMDGOALS))"
 
 install:
 	$(MAKE) docker-run CMD="composer update $(filter-out $@,$(MAKECMDGOALS))"
+	npm install
 
 requirements:
 	$(MAKE) image-pull
 	$(MAKE) install
 	[ -f vendor/bin/phpstan ] && chmod +x vendor/bin/phpstan || true
+	rm -R -f temp/cache
 	chmod -R a+rw temp log
-	$(MAKE) assets
+	$(MAKE) vite-build
 
 composer:
 	$(MAKE) docker-run CMD="composer $(filter-out $@,$(MAKECMDGOALS))"

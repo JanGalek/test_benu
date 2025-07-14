@@ -18,17 +18,36 @@ Požadavky:
 - unit testy - alespoň jeden užitečný unit test, který mohu jednoduše spustit (nápověda - composer scripts)
 - nástroje na kontrolu code style a správnosti kódu, které mohu jednoduše spustit (nápověda - phpcs, phpstan)
 
-## Příkazy
+# Projekt
 
-- `composer tests` / `make phpunit` - spustí phpunit testy
+## Požadavky
+Pro jednoduché a rychlé spuštění je nutné mít nainstalované:
+- make
+- docker / podman
+- prohlížeč
 
-## Testy
-
-
+Osobně používám podman, proto jsem využil make, který detekuje, zdali je nainstalován docker nebo podman.
 
 ## Spuštění
-- `make requirements`
+- `make requirements` 
 - `make start`
 
 aplikace je na adrese: http://127.0.0.1:8085/
 
+
+## Příkazy
+- `make requirements` - nainstaluje a stáhne vše potřebné (stáhne docker image, nainstaluje závislosti)
+- `make start-dev` - spustí vývojovou aplikaci na portu 8085 (s NETTE_DEBUG)
+- `make start` - spustí aplikace na portu 8085
+- `make stop-dev` - zastaví vývojovou aplikaci
+- `make stop` - zastaví aplikace
+- `make tests` - spustí phpunit testy
+- `make analyse` - spustí phpstan
+- `make cs` - zkontroluje coding standards
+- `make csf` - opraví opravitelné chyby podle coding standards
+- `make qa` - spustí analyse a cs
+
+### Pomocné
+- `make vite-build` - zbuildí frontend aplikaci za pomocí vite (v dockeru)
+- `make npm` - zdockerizované npm, lze použít pro instalaci dalších závislostí, atd... (pro přepínače je potřeba použít `--` před přepínači pro npm)
+- `make npx` - zdockerizované npx, lze použít pro spouštění npx příkazů, atd... (pro přepínače je potřeba použít `--` před přepínači pro npx)

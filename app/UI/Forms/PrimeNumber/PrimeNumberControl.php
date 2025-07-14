@@ -6,6 +6,7 @@ use App\Utils\Math\PrimeNumber\TableFactory;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Nette\Application\UI\Template;
 
 class PrimeNumberControl extends Control
 {
@@ -17,38 +18,47 @@ class PrimeNumberControl extends Control
     {
     }
 
-    public function formSucceeded(Form $form, array $data): void
-    {
-        $this->size = $data['size'];
-        $this->getPresenter()->redrawControl();
-    }
-
     public function render(): void
     {
-        $this->template->size = $this->size;
-        $this->template->table = null;
+        /** @var Template $template */
+        $template = $this->template;
+        $template->size = $this->size;
+        $template->table = null;
         if ($this->size !== null) {
             $table = $this->tableFactory->create($this->size);
-            $this->template->rows = $table->rows;
-            $this->template->primeNumbers = $table->primeNumbers;
-            $this->template->table = $this->tableFactory->create($this->size)->toArray();
+            $template->rows = $table->rows;
+            $template->primeNumbers = $table->primeNumbers;
+            $template->table = $this->tableFactory->create($this->size)->toArray();
         }
 
-        $this->template->render(__DIR__ . '/default.latte');
+        $template->setFile(__DIR__ . '/default.latte');
+        $template->render();
+    }
+
+    public function formSucceeded(Form $form, PrimeNumberData $data): void
+    {
+        $this->size = $data->size;
+        $this->getPresenter()->redrawControl();
+        $this->redrawControl();
     }
 
     protected function createComponentPrimeNumberForm(): Form
     {
         $form = new Form();
-        $form->setHtmlAttribute('class', 'ajax');
+        $form->setMappedType(PrimeNumberData::class);
+        $form->setHtmlAttribute('class', 'ajax row g-2 align-items-center');
         $form->addInteger('size', 'Počet:')
             ->setRequired('Zadejte počet')
             ->addRule($form::Min, 'Počet musí být větší jak 0.', 1)
-            ->setHtmlAttribute('class', 'form-label');
+            ->setHtmlAttribute('class', 'form-control')
+            ->setDefaultValue(1);
 
         $form->addSubmit('send', 'Odeslat')
             ->setHtmlAttribute('class', 'btn btn-primary');
-        $form->onSuccess[] = [$this, 'formSucceeded'];
+        $form->onSuccess[] = function (Form $form, mixed $data): void {
+            /** @var PrimeNumberData $data */
+            $this->formSucceeded($form, $data);
+        };
         $form->addProtection();
 
         return $form;

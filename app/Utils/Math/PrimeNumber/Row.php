@@ -8,15 +8,10 @@ class Row
     /**
      * @param Line[] $lines
      */
-    public function __construct(public PrimeNumber $primeNumber {
-        get {
-            return $this->primeNumber;
-        }
-    }, public array $lines {
-        get {
-            return $this->lines;
-        }
-    })
+    public function __construct(
+        public PrimeNumber $primeNumber,
+        public array $lines
+    )
     {
     }
 

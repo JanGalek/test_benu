@@ -5,6 +5,9 @@ namespace App\Utils;
 interface Arrayable
 {
 
+    /**
+     * @return array<mixed,mixed>
+     */
     public function toArray(): array;
 
 }

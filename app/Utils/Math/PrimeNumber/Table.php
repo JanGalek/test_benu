@@ -16,7 +16,7 @@ readonly class Table implements Arrayable
     }
 
     /**
-     * @return int[]
+     * @return array<int, array<int, int>>
      */
     public function toArray(): array
     {

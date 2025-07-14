@@ -1,4 +1,16 @@
-{control primeNumberForm}
+<div class="d-flex justify-content-center py-3">
+    {form primeNumberForm}
+        <div class="col-auto">
+            <label for="sizeInput" class="col-form-label">{$form['size']->caption}</label>
+        </div>
+        <div class="col-auto">
+            {input size}
+        </div>
+        <div class="col-auto">
+            {input send}
+        </div>
+    {/form}
+</div>
 
 <div n:snippet="table">
     <div class="py-2">
