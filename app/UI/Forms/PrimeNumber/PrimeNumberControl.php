@@ -55,7 +55,7 @@ class PrimeNumberControl extends Control
 
         $form->addSubmit('send', 'Odeslat')
             ->setHtmlAttribute('class', 'btn btn-primary');
-        $form->onSuccess[] = function (Form $form, mixed $data): void {
+        $form->onSuccess[] = function (Form $form, $data): void {
             /** @var PrimeNumberData $data */
             $this->formSucceeded($form, $data);
         };
